@@ -1,6 +1,8 @@
 # MatlabWebData
 Get Web Data Using Matlab
-包括历史数据、财务数据等，主要函数如下：
+  
+ 包括历史数据、财务数据等，主要函数如下：
+  
     获取新浪日线数据：   [ daydata ] = sina_daydata( code, isindex )
     
     获取新浪tick数据：   [ tickdata ] = sina_tickdata( code,datetime )
