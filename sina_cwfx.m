@@ -1,11 +1,11 @@
 function [ cwfx ] = sina_cwfx( type,datayear,dataquarter )
-%% Description sina_cwfx »ñÈ¡ĞÂÀË²ÆÎñ·ÖÎöÊı¾İ
+%% Description sina_cwfx è·å–æ–°æµªè´¢åŠ¡åˆ†ææ•°æ®
 %% Inputs:
-%  type   ²ÆÎñ·ÖÎöÀàĞÍ£¬'profit','operation','grow','debtpaying','cashflow','mainindex','performance','news','incomedetail'
-%  datayear   ±¨¸æÄê¶È
-%  dataquarter  ±¨¸æ¼¾¶È
+%  type   è´¢åŠ¡åˆ†æç±»å‹ï¼Œ'profit','operation','grow','debtpaying','cashflow','mainindex','performance','news','incomedetail'
+%  datayear   æŠ¥å‘Šå¹´åº¦
+%  dataquarter  æŠ¥å‘Šå­£åº¦
 %% Outputs:
-%  cwfx    ²ÆÎñ·ÖÎöÊı¾İ
+%  cwfx    è´¢åŠ¡åˆ†ææ•°æ®
 %% 
     switch nargin
         case 0 
@@ -31,7 +31,7 @@ function [ cwfx ] = sina_cwfx( type,datayear,dataquarter )
             end
         case 3
             if ~any(dataquarter == [1,2,3,4,'1','2','3','4'])
-                error('¼¾¶ÈÊäÈë´íÎó£¬Îª1£¬2£¬3£¬4Ö®Ò»');
+                error('å­£åº¦è¾“å…¥é”™è¯¯ï¼Œä¸º1ï¼Œ2ï¼Œ3ï¼Œ4ä¹‹ä¸€');
             end
     end
     if ~any(strcmp(type,{'profit','operation','grow','debtpaying','cashflow','mainindex','performance','news','incomedetail'}))
@@ -42,7 +42,7 @@ function [ cwfx ] = sina_cwfx( type,datayear,dataquarter )
     page= urlread(strcat('http://vip.stock.finance.sina.com.cn/q/go.php/vFinanceAnalyze/kind/',type,'/index.phtml?reportdate=',datayear,'&quarter=',dataquarter,'&num=10000'),'Charset','GB2312');
     switch type
         case 'profit'
-            exp = 'center\D*(?<code>\d{6})\D*blank\D{2}(?<name>\D*)\D{2}a\D*d>(?<roe>\D*\d*.\d*)\D{2}t\D*d>(?<netprofitmargin>\D*\d*.\d*)\D{2}t\D*d>(?<profitmargin>\D*\d*.\d*)\D{2}t\D*d>(?<netprofit>\D*\d*.\d*)\D{2}t\D*d>(?<eps>\D*\d*.\d*)\D{2}t\D*d>(?<income>\D*\d*.\d*)\D{2}t\D*d>(?<mips>\D*\d*.\d*)';
+            exp = 'q=(?<code>\d{6})&contry\D*_blank">(?<name>\D*)</a>\D*<td>(?<roe>\S*)</td>\D*<td>(?<netprofitmargin>\S*)</td>\D*<td>(?<profitmargin>\S*)</td>\D*<td>(?<netprofit>\S*)</td>\D*<td>(?<eps>\S*)</td>\D*<td>(?<income>\S*)</td>\D*<td>(?<mips>\S*)</td>';
         case 'operation'
             exp = 'center\D*(?<code>\d{6})\D*blank\D{2}(?<name>\D*)\D{2}a\D*d>(?<yszkzzl>\S*)\D{2}t\D*d>(?<yszkzzts>\S*)\D{2}t\D*d>(?<chzzl>\S*)\D{2}t\D*d>(?<chzzts>\S*)\D{2}t\D*d>(?<ldzczzl>\S*)\D{2}t\D*d>(?<ldzczzts>\S*)\D{2}t';
         case 'grow'
@@ -64,69 +64,68 @@ function [ cwfx ] = sina_cwfx( type,datayear,dataquarter )
         cwfx=struct2table(regexp(page,exp,'names'));
         switch type
             case 'profit'
-                cwfx.eps = data.web.webstr2num(cwfx.eps);
-                cwfx.yeps = data.web.webstr2num(cwfx.yeps);
-                cwfx.epsrate = data.web.webstr2num(cwfx.epsrate);
-                cwfx.netprofit = data.web.webstr2num(cwfx.netprofit);
-                cwfx.netprofitrate = data.web.webstr2num(cwfx.netprofitrate);
-                cwfx.navps = data.web.webstr2num(cwfx.navps);
-                cwfx.roe = data.web.webstr2num(cwfx.roe);
-                cwfx.sumnavps = data.web.webstr2num(cwfx.sumnavps);
+                cwfx.roe = webstr2num(cwfx.roe);
+                cwfx.netprofitmargin = webstr2num(cwfx.netprofitmargin);
+                cwfx.profitmargin = webstr2num(cwfx.profitmargin);
+                cwfx.netprofit = webstr2num(cwfx.netprofit);
+                cwfx.eps = webstr2num(cwfx.eps);
+                cwfx.income = webstr2num(cwfx.income);
+                cwfx.mips = webstr2num(cwfx.mips);
             case 'operation'
-                cwfx.yszkzzl = data.web.webstr2num(cwfx.yszkzzl);  % Ó¦ÊÕÕË¿îÖÜ×ªÂÊ
-                cwfx.yszkzzts = data.web.webstr2num(cwfx.yszkzzts); % Ó¦ÊÕÕË¿îÖÜ×ªÌìÊı
-                cwfx.chzzl = data.web.webstr2num(cwfx.chzzl);  % ´æ»õÖÜ×ªÂÊ
-                cwfx.chzzts = data.web.webstr2num(cwfx.chzzts);  % ´æ»õÖÜ×ªÌìÊı
-                cwfx.ldzczzl = data.web.webstr2num(cwfx.ldzczzl);  % Á÷¶¯×Ê²úÖÜ×ªÂÊ
-                cwfx.ldzczzts = data.web.webstr2num(cwfx.ldzczzts);  % Á÷¶¯×Ê²úÖÜ×ªÌìÊı
+                cwfx.yszkzzl = webstr2num(cwfx.yszkzzl);  % åº”æ”¶è´¦æ¬¾å‘¨è½¬ç‡
+                cwfx.yszkzzts = webstr2num(cwfx.yszkzzts); % åº”æ”¶è´¦æ¬¾å‘¨è½¬å¤©æ•°
+                cwfx.chzzl = webstr2num(cwfx.chzzl);  % å­˜è´§å‘¨è½¬ç‡
+                cwfx.chzzts = webstr2num(cwfx.chzzts);  % å­˜è´§å‘¨è½¬å¤©æ•°
+                cwfx.ldzczzl = webstr2num(cwfx.ldzczzl);  % æµåŠ¨èµ„äº§å‘¨è½¬ç‡
+                cwfx.ldzczzts = webstr2num(cwfx.ldzczzts);  % æµåŠ¨èµ„äº§å‘¨è½¬å¤©æ•°
             case 'grow'
-                cwfx.mainincome = data.web.webstr2num(cwfx.mainincome);  % Ö÷ÓªÒµÎñÊÕÈëÔö³¤ÂÊ
-                cwfx.netprofit = data.web.webstr2num(cwfx.netprofit); % ¾»ÀûÈóÔö³¤ÂÊ
-                cwfx.netassets = data.web.webstr2num(cwfx.netassets);  % ¾»×Ê²úÔö³¤ÂÊ
-                cwfx.totalassets = data.web.webstr2num(cwfx.totalassets);  % ×Ü×Ê²úÔö³¤ÂÊ
-                cwfx.eps = data.web.webstr2num(cwfx.eps);  % Ã¿¹ÉÊÕÒæÔö³¤ÂÊ
-                cwfx.sgr = data.web.webstr2num(cwfx.sgr);  % ¹É¶«È¨ÒæÔö³¤ÂÊ
+                cwfx.mainincome = webstr2num(cwfx.mainincome);  % ä¸»è¥ä¸šåŠ¡æ”¶å…¥å¢é•¿ç‡
+                cwfx.netprofit = webstr2num(cwfx.netprofit); % å‡€åˆ©æ¶¦å¢é•¿ç‡
+                cwfx.netassets = webstr2num(cwfx.netassets);  % å‡€èµ„äº§å¢é•¿ç‡
+                cwfx.totalassets = webstr2num(cwfx.totalassets);  % æ€»èµ„äº§å¢é•¿ç‡
+                cwfx.eps = webstr2num(cwfx.eps);  % æ¯è‚¡æ”¶ç›Šå¢é•¿ç‡
+                cwfx.sgr = webstr2num(cwfx.sgr);  % è‚¡ä¸œæƒç›Šå¢é•¿ç‡
             case 'debtpaying'
-                cwfx.current = data.web.webstr2num(cwfx.current);  % Á÷¶¯±ÈÂÊ
-                cwfx.quick = data.web.webstr2num(cwfx.quick); % ËÙ¶¯±ÈÂÊ
-                cwfx.cash = data.web.webstr2num(cwfx.cash);  % ÏÖ½ğ±ÈÂÊ
-                cwfx.icr = data.web.webstr2num(cwfx.icr);  % ÀûÏ¢Ö§¸¶±¶Êı
-                cwfx.equity = data.web.webstr2num(cwfx.equity);  % ¹É¶«È¨Òæ±ÈÂÊ
-                cwfx.debt2asset = data.web.webstr2num(cwfx.debt2asset);  % ×Ê²ú¸ºÕ®ÂÊ
+                cwfx.current = webstr2num(cwfx.current);  % æµåŠ¨æ¯”ç‡
+                cwfx.quick = webstr2num(cwfx.quick); % é€ŸåŠ¨æ¯”ç‡
+                cwfx.cash = webstr2num(cwfx.cash);  % ç°é‡‘æ¯”ç‡
+                cwfx.icr = webstr2num(cwfx.icr);  % åˆ©æ¯æ”¯ä»˜å€æ•°
+                cwfx.equity = webstr2num(cwfx.equity);  % è‚¡ä¸œæƒç›Šæ¯”ç‡
+                cwfx.debt2asset = webstr2num(cwfx.debt2asset);  % èµ„äº§è´Ÿå€ºç‡
             case 'cashflow'            
-                cwfx.cashflow2income = data.web.webstr2num(cwfx.cashflow2income);  % ¾­ÓªÏÖ½ğ¾»Á÷Á¿¶ÔÏúÊÛÊÕÈë±ÈÂÊ
-                cwfx.cashflowrepay = data.web.webstr2num(cwfx.cashflowrepay); % ×Ê²úµÄ¾­ÓªÏÖ½ğÁ÷Á¿»Ø±¨ÂÊ
-                cwfx.cashflow2netprofit = data.web.webstr2num(cwfx.cashflow2netprofit);  % ¾­ÓªÏÖ½ğ¾»Á÷Á¿Óë¾»ÀûÈóµÄ±ÈÂÊ
-                cwfx.cashflow2debt = data.web.webstr2num(cwfx.cashflow2debt);  % ¾­ÓªÏÖ½ğ¾»Á÷Á¿¶Ô¸ºÕ®µÄ±ÈÂÊ
-                cwfx.cashflow = data.web.webstr2num(cwfx.cashflow);  % ÏÖ½ğÁ÷Á¿±ÈÂÊ
+                cwfx.cashflow2income = webstr2num(cwfx.cashflow2income);  % ç»è¥ç°é‡‘å‡€æµé‡å¯¹é”€å”®æ”¶å…¥æ¯”ç‡
+                cwfx.cashflowrepay = webstr2num(cwfx.cashflowrepay); % èµ„äº§çš„ç»è¥ç°é‡‘æµé‡å›æŠ¥ç‡
+                cwfx.cashflow2netprofit = webstr2num(cwfx.cashflow2netprofit);  % ç»è¥ç°é‡‘å‡€æµé‡ä¸å‡€åˆ©æ¶¦çš„æ¯”ç‡
+                cwfx.cashflow2debt = webstr2num(cwfx.cashflow2debt);  % ç»è¥ç°é‡‘å‡€æµé‡å¯¹è´Ÿå€ºçš„æ¯”ç‡
+                cwfx.cashflow = webstr2num(cwfx.cashflow);  % ç°é‡‘æµé‡æ¯”ç‡
             case 'mainindex'
-                cwfx.eps = data.web.webstr2num(cwfx.eps);  % Ã¿¹ÉÊÕÒæ
-                cwfx.epsrate = data.web.webstr2num(cwfx.epsrate); % Ã¿¹ÉÊÕÒæÍ¬±È
-                cwfx.navps = data.web.webstr2num(cwfx.navps);  % Ã¿¹É¾»×Ê²ú
-                cwfx.roe = data.web.webstr2num(cwfx.roe);  % ¾­ÓªÏÖ½ğ¾»Á÷Á¿¶Ô¸ºÕ®µÄ±ÈÂÊ
-                cwfx.cps = data.web.webstr2num(cwfx.cps);  % ÏÖ½ğÁ÷Á¿±ÈÂÊ
-                cwfx.netprofit = data.web.webstr2num(cwfx.netprofit);  % ¾­ÓªÏÖ½ğ¾»Á÷Á¿¶Ô¸ºÕ®µÄ±ÈÂÊ
-                cwfx.netprofitrate = data.web.webstr2num(cwfx.netprofitrate);  % ÏÖ½ğÁ÷Á¿±ÈÂÊ
+                cwfx.eps = webstr2num(cwfx.eps);  % æ¯è‚¡æ”¶ç›Š
+                cwfx.epsrate = webstr2num(cwfx.epsrate); % æ¯è‚¡æ”¶ç›ŠåŒæ¯”
+                cwfx.navps = webstr2num(cwfx.navps);  % æ¯è‚¡å‡€èµ„äº§
+                cwfx.roe = webstr2num(cwfx.roe);  % ç»è¥ç°é‡‘å‡€æµé‡å¯¹è´Ÿå€ºçš„æ¯”ç‡
+                cwfx.cps = webstr2num(cwfx.cps);  % ç°é‡‘æµé‡æ¯”ç‡
+                cwfx.netprofit = webstr2num(cwfx.netprofit);  % ç»è¥ç°é‡‘å‡€æµé‡å¯¹è´Ÿå€ºçš„æ¯”ç‡
+                cwfx.netprofitrate = webstr2num(cwfx.netprofitrate);  % ç°é‡‘æµé‡æ¯”ç‡
             case 'performance'
-                cwfx.pre_eps = data.web.webstr2num(cwfx.pre_eps);  % ÉÏÄêÍ¬ÆÚÃ¿¹ÉÊÕÒæ
+                cwfx.pre_eps = webstr2num(cwfx.pre_eps);  % ä¸Šå¹´åŒæœŸæ¯è‚¡æ”¶ç›Š
             case 'news'            
-                cwfx.eps = data.web.webstr2num(cwfx.eps);  % Ã¿¹ÉÊÕÒæ
-                cwfx.yeps = data.web.webstr2num(cwfx.yeps); % ÓªÒµÊÕÈë£¨ÍòÔª£©
-                cwfx.epsrate = data.web.webstr2num(cwfx.epsrate);  % ÓªÒµÊÕÈëÍ¬±È
-                cwfx.netprofit = data.web.webstr2num(cwfx.netprofit);  % ¾»ÀûÈó£¨ÍòÔª£©
-                cwfx.netprofitrate = data.web.webstr2num(cwfx.netprofitrate);  % ¾»ÀûÈóÍ¬±È
-                cwfx.navps = data.web.webstr2num(cwfx.navps);  % Ã¿¹É¾»×Ê²ú£¨Ôª£©
-                cwfx.roe = data.web.webstr2num(cwfx.roe);  % ¾»×Ê²úÊÕÒæÂÊ
-                cwfx.sumnavps = data.web.webstr2num(cwfx.sumnavps);  % ×Ü×Ê²ú£¨ÍòÔª£©
+                cwfx.eps = webstr2num(cwfx.eps);  % æ¯è‚¡æ”¶ç›Š
+                cwfx.yeps = webstr2num(cwfx.yeps); % è¥ä¸šæ”¶å…¥ï¼ˆä¸‡å…ƒï¼‰
+                cwfx.epsrate = webstr2num(cwfx.epsrate);  % è¥ä¸šæ”¶å…¥åŒæ¯”
+                cwfx.netprofit = webstr2num(cwfx.netprofit);  % å‡€åˆ©æ¶¦ï¼ˆä¸‡å…ƒï¼‰
+                cwfx.netprofitrate = webstr2num(cwfx.netprofitrate);  % å‡€åˆ©æ¶¦åŒæ¯”
+                cwfx.navps = webstr2num(cwfx.navps);  % æ¯è‚¡å‡€èµ„äº§ï¼ˆå…ƒï¼‰
+                cwfx.roe = webstr2num(cwfx.roe);  % å‡€èµ„äº§æ”¶ç›Šç‡
+                cwfx.sumnavps = webstr2num(cwfx.sumnavps);  % æ€»èµ„äº§ï¼ˆä¸‡å…ƒï¼‰
             case 'incomedetail'
-                cwfx.income = data.web.webstr2num(cwfx.income);  % Ã¿¹ÉÊÕÒæ
-                cwfx.cost = data.web.webstr2num(cwfx.cost); % ÓªÒµÊÕÈë£¨ÍòÔª£©
-                cwfx.profit = data.web.webstr2num(cwfx.profit);  % ÓªÒµÊÕÈëÍ¬±È
+                cwfx.income = webstr2num(cwfx.income);  % æ¯è‚¡æ”¶ç›Š
+                cwfx.cost = webstr2num(cwfx.cost); % è¥ä¸šæ”¶å…¥ï¼ˆä¸‡å…ƒï¼‰
+                cwfx.profit = webstr2num(cwfx.profit);  % è¥ä¸šæ”¶å…¥åŒæ¯”
         end
         cwfx.year = repmat(datayear,size(cwfx.code));
         cwfx.quarter = repmat(dataquarter,size(cwfx.code));
     catch
-        display('ÎŞÊı¾İ');
+        disp('æ— æ•°æ®');
     end
 end
 
