@@ -14,10 +14,10 @@ Get Web Data Using Matlab
       获取新浪大宗交易数据：[ dzjy ] = sina_dzjy(datanum, pagenum )
     
       获取新浪行业关注度:   [ hygzd ] = sina_hygzd( ndays )
-    
+      
       获取新浪机构重仓数据: [ jgzc ] = sina_jgzc( type,datayear,dataquarter )
-    
-      获取新浪龙虎榜日数据：[ lhb ] = sina_lhb( tradedate )
+      
+      获取新浪龙虎榜日数据：[ lhb ] = sina_lhb( tradedate )
     
       获取新浪龙虎榜统计：  [ lhbtj ] = sina_lhbtj( type,ndays )
     
